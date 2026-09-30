@@ -1,0 +1,17 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "encobu"
+version = "0.1.0"
+description = "A modern CLI tool built with standard libraries to encode, obfuscate and test payloads against simple firewall rules" 
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+    { name = "SpoodoW" }
+]
+dependencies = []
+
+[project.scripts]
+encobu = "encobu.cli:main"

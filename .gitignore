@@ -1,0 +1,20 @@
+# Virtual Environment
+.venv/
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Hatchling & Build Artifacts
+dist/
+build/
+.hatch/
+*.egg-info/
+
+# VSCodium Workspace Settings
+.vscode/
+
+# OS-Specific Metadata
+.DS_Store
+Thumbs.db
