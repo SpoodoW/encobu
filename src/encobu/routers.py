@@ -1,7 +1,7 @@
 import sys
 from argparse import Namespace
 
-from . import decode, encode, enums, obfuscate
+from . import decode, deobfuscate, encode, enums, obfuscate
 
 
 def routing_encode(args: Namespace) -> int:
@@ -51,7 +51,7 @@ def routing_obfuscation(args: Namespace) -> int:
     else:
         payload_to_obfus = args.payload
 
-    match args.algo:
+    match args.algorithm:
         case enums.ObfuscationAlgos.RANDOM_CHARACTER_INSERTION:
             result = obfuscate.rand_char_insert(
                 payload_to_obfus, args.stride, args.noise_length
@@ -59,7 +59,7 @@ def routing_obfuscation(args: Namespace) -> int:
 
         case enums.ObfuscationAlgos.SPLIT_AND_CONCATENATE:
             result = obfuscate.split_and_concat(
-                payload_to_obfus, args.stride, args.operator
+                payload_to_obfus, args.stride, args.concat_operator
             )
 
         case enums.ObfuscationAlgos.REVERSIBLE_TRANSFORMATION:
@@ -111,5 +111,28 @@ def routing_decode(args: Namespace) -> int:
         case _:
             print("Error specified algorithm not recognized", file=sys.stderr)
             return 1
+    print(result)
+    return 0
+
+def routing_deobfuscation(args: Namespace) -> int:
+    if args.file:
+        with args.file as f:
+            obfuscated_payload = f.read()
+    else:
+        obfuscated_payload = args.payload
+
+    match args.algorithm:
+        case enums.DeobfuscationAlgos.REVERSE_RANDOM_CHARACTER_INSERTION:
+            result = deobfuscate.rev_rand_char_insert(obfuscated_payload, args.stride, args.noise_length)
+        case enums.DeobfuscationAlgos.REVERSE_SPLIT_AND_CONCATENATE:
+            result = deobfuscate.rev_split_and_concat(obfuscated_payload, args.concat_operator)
+        case enums.DeobfuscationAlgos.REVERSE_REVERSIBLE_TRANSFORMATION:
+            result = deobfuscate.rev_reverse_transform(obfuscated_payload)
+        case enums.DeobfuscationAlgos.REVERSE_ESCAPE_SEQUENCE_OBFUSCATION:
+            result = deobfuscate.rev_escape_sequence(obfuscated_payload)
+        case _:
+            print("Error specified algorithm not recognized", file=sys.stderr)
+            return 1
+
     print(result)
     return 0

@@ -2,6 +2,11 @@ import random
 import string
 import textwrap
 
+ABTASH_MAP = str.maketrans(
+    string.ascii_uppercase + string.ascii_lowercase,
+    string.ascii_uppercase[::-1] + string.ascii_lowercase[::-1],
+)
+
 
 def rand_char_insert(payload: str, stride: int, noise_len: int) -> str:
     payload_stripped = payload.replace(" ", "_")
@@ -17,21 +22,15 @@ def rand_char_insert(payload: str, stride: int, noise_len: int) -> str:
     return "".join(chunks)
 
 
-def split_and_concat(payload: str, stride: int, concat_operator: str = "+"):
+def split_and_concat(payload: str, stride: int, concat_operator: str = "+") -> str:
     payload_stripped = payload.replace(" ", "_")
-    chunks = textwrap.wrap(payload_stripped, width=stride, drop_whitespace=False)
+    chunks = textwrap.wrap(payload_stripped, width=stride)
 
     return f" {concat_operator} ".join(f'"{chunk}"' for chunk in chunks)
 
 
 def reverse_transform(payload: str) -> str:
-    payload_stripped = payload.replace(" ", "_")
-    standard_alpha = string.ascii_uppercase + string.ascii_lowercase
-    reverse_alpha: str = string.ascii_uppercase[::-1] + string.ascii_lowercase[::-1]
-
-    abtash_map = str.maketrans(standard_alpha, reverse_alpha)
-
-    return payload_stripped.translate(abtash_map)
+    return payload.replace(" ", "_").translate(ABTASH_MAP)
 
 
 def escape_sequence(

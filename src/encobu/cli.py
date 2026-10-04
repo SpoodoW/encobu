@@ -69,7 +69,7 @@ def creating_parser() -> ArgumentParser:
         help=constants.EncodeSubCommand.KEY_HELP,
     )
 
-    obfuscate_parser = subparser.add_parser(
+    obfus_parser = subparser.add_parser(
         "obfus",
         description=constants.ObfusSubCommand.DESCRIPTION,
         help=constants.ObfusSubCommand.HELP,
@@ -77,9 +77,9 @@ def creating_parser() -> ArgumentParser:
         formatter_class=RawTextHelpFormatter,
     )
 
-    obfuscate_parser.set_defaults(func=routers.routing_obfuscation)
+    obfus_parser.set_defaults(func=routers.routing_obfuscation)
 
-    obfus_parser_group = obfuscate_parser.add_mutually_exclusive_group(required=True)
+    obfus_parser_group = obfus_parser.add_mutually_exclusive_group(required=True)
 
     obfus_parser_group.add_argument(
         "-P",
@@ -97,9 +97,9 @@ def creating_parser() -> ArgumentParser:
         metavar=constants.ObfusSubCommand.FILE_METAVAR,
     )
 
-    obfuscate_parser.add_argument(
+    obfus_parser.add_argument(
         "-a",
-        "--algo",
+        "--algorithm",
         type=enums.ObfuscationAlgos,
         choices=list(enums.ObfuscationAlgos),
         required=True,
@@ -107,7 +107,7 @@ def creating_parser() -> ArgumentParser:
         metavar=constants.ObfusSubCommand.ALGO_METAVAR,
     )
 
-    obfuscate_parser.add_argument(
+    obfus_parser.add_argument(
         "-s",
         "--stride",
         type=int,
@@ -116,7 +116,7 @@ def creating_parser() -> ArgumentParser:
         metavar=constants.ObfusSubCommand.STRIDE_METAVAR,
     )
 
-    obfuscate_parser.add_argument(
+    obfus_parser.add_argument(
         "-n",
         "--noise-length",
         type=int,
@@ -125,16 +125,16 @@ def creating_parser() -> ArgumentParser:
         metavar=constants.ObfusSubCommand.NOISE_LEN_METAVAR,
     )
 
-    obfuscate_parser.add_argument(
-        "-o",
-        "--operator",
+    obfus_parser.add_argument(
+        "-c",
+        "--concat-operator",
         type=str,
         default="+",
         help=constants.ObfusSubCommand.OPERATOR_HELP,
         metavar=constants.ObfusSubCommand.OPERATOR_METAVAR,
     )
 
-    obfuscate_parser.add_argument(
+    obfus_parser.add_argument(
         "-e",
         "--escape-type",
         type=str,
@@ -144,7 +144,7 @@ def creating_parser() -> ArgumentParser:
         metavar=constants.ObfusSubCommand.ESCAPE_TYPE_METAVAR,
     )
 
-    obfuscate_parser.add_argument(
+    obfus_parser.add_argument(
         "-p",
         "--poly",
         action="store_true",
@@ -153,9 +153,9 @@ def creating_parser() -> ArgumentParser:
 
     decode_parser = subparser.add_parser(
         "decode",
-        description=constants.DecodingCommand.DESCRIPTION,
-        help=constants.DecodingCommand.HELP,
-        epilog=constants.DecodingCommand.EPILOG,
+        description=constants.DecodingSubCommand.DESCRIPTION,
+        help=constants.DecodingSubCommand.HELP,
+        epilog=constants.DecodingSubCommand.EPILOG,
         formatter_class=RawTextHelpFormatter,
     )
 
@@ -167,16 +167,16 @@ def creating_parser() -> ArgumentParser:
         "-P",
         "--payload",
         type=str,
-        help=constants.DecodingCommand.PAYLOAD_HELP,
-        metavar=constants.DecodingCommand.PAYLOAD_METAVAR,
+        help=constants.DecodingSubCommand.PAYLOAD_HELP,
+        metavar=constants.DecodingSubCommand.PAYLOAD_METAVAR,
     )
 
     decode_parser_group.add_argument(
         "-F",
         "--file",
         type=FileType("r", encoding="utf-8"),
-        help=constants.DecodingCommand.FILE_HELP,
-        metavar=constants.DecodingCommand.FILE_METAVAR,
+        help=constants.DecodingSubCommand.FILE_HELP,
+        metavar=constants.DecodingSubCommand.FILE_METAVAR,
     )
 
     decode_parser.add_argument(
@@ -185,17 +185,79 @@ def creating_parser() -> ArgumentParser:
         type=enums.DecodingMethod,
         choices=list(enums.DecodingMethod),
         required=True,
-        help=constants.DecodingCommand.METHOD_HELP,
-        metavar=constants.DecodingCommand.METHOD_METAVAR,
+        help=constants.DecodingSubCommand.METHOD_HELP,
+        metavar=constants.DecodingSubCommand.METHOD_METAVAR,
     )
 
     decode_parser.add_argument(
         "-k",
         "--key",
         type=str,
-        help=constants.DecodingCommand.KEY_HELP,
-        metavar=constants.DecodingCommand.KEY_METAVAR,
+        help=constants.DecodingSubCommand.KEY_HELP,
+        metavar=constants.DecodingSubCommand.KEY_METAVAR,
     )
+
+    deobfus_parser = subparser.add_parser(
+        "deobfus",
+    )
+
+    deobfus_parser.set_defaults(func=routers.routing_deobfuscation)
+
+    deobfus_parser_group = deobfus_parser.add_mutually_exclusive_group(required=True)
+
+    deobfus_parser_group.add_argument(
+        "-P",
+        "--payload",
+        type=str,
+        help=constants.DeobfusSubCommand.PAYLOAD_HELP,
+        metavar=constants.DeobfusSubCommand.PAYLOAD_METAVAR,
+    )
+
+    deobfus_parser_group.add_argument(
+        "-F",
+        "--file",
+        type=FileType("r", encoding="utf-8"),
+        help=constants.DeobfusSubCommand.FILE_HELP,
+        metavar=constants.DeobfusSubCommand.FILE_METAVAR,
+    )
+
+    deobfus_parser.add_argument(
+        "-a",
+        "--algorithm",
+        type=enums.ObfuscationAlgos,
+        choices=list(enums.ObfuscationAlgos),
+        required=True,
+        help=constants.DeobfusSubCommand.ALGO_HELP,
+        metavar=constants.DeobfusSubCommand.ALGO_METAVAR
+    )
+
+    deobfus_parser.add_argument(
+        "-s",
+        "--stride",
+        type=int,
+        default=3,
+        help=constants.DeobfusSubCommand.STRIDE_HELP,
+        metavar=constants.DeobfusSubCommand.STRIDE_METAVAR
+    )
+
+    deobfus_parser.add_argument(
+        "-n",
+        "--noise-length",
+        type=int,
+        default=1,
+        help=constants.DeobfusSubCommand.NOISE_LEN_HELP,
+        metavar=constants.DeobfusSubCommand.NOISE_LEN_METAVAR
+    )
+
+    deobfus_parser.add_argument(
+        "-c",
+        "--concat-operator",
+        type=str,
+        default="+",
+        help=constants.DeobfusSubCommand.OPERATOR_HELP,
+        metavar=constants.DeobfusSubCommand.OPERATOR_METAVAR
+    )
+
 
     return parser
 

