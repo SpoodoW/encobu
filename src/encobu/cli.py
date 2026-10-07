@@ -1,9 +1,9 @@
 import sys
 from argparse import (
     ArgumentParser,
-    FileType,
     RawTextHelpFormatter,
 )
+from pathlib import Path
 
 from . import constants, enums, routers
 
@@ -47,7 +47,7 @@ def creating_parser() -> ArgumentParser:
     enc_parser_group.add_argument(
         "-F",
         "--file",
-        type=FileType("r", encoding="utf-8"),
+        type=Path,
         help=constants.EncodeSubCommand.FILE_HELP,
         metavar=constants.EncodeSubCommand.FILE_METAVAR,
     )
@@ -92,7 +92,7 @@ def creating_parser() -> ArgumentParser:
     obfus_parser_group.add_argument(
         "-F",
         "--file",
-        type=FileType("r", encoding="utf-8"),
+        type=Path,
         help=constants.ObfusSubCommand.FILE_HELP,
         metavar=constants.ObfusSubCommand.FILE_METAVAR,
     )
@@ -174,7 +174,7 @@ def creating_parser() -> ArgumentParser:
     decode_parser_group.add_argument(
         "-F",
         "--file",
-        type=FileType("r", encoding="utf-8"),
+        type=Path,
         help=constants.DecodingSubCommand.FILE_HELP,
         metavar=constants.DecodingSubCommand.FILE_METAVAR,
     )
@@ -216,7 +216,7 @@ def creating_parser() -> ArgumentParser:
     deobfus_parser_group.add_argument(
         "-F",
         "--file",
-        type=FileType("r", encoding="utf-8"),
+        type=Path,
         help=constants.DeobfusSubCommand.FILE_HELP,
         metavar=constants.DeobfusSubCommand.FILE_METAVAR,
     )
@@ -228,7 +228,7 @@ def creating_parser() -> ArgumentParser:
         choices=list(enums.ObfuscationAlgos),
         required=True,
         help=constants.DeobfusSubCommand.ALGO_HELP,
-        metavar=constants.DeobfusSubCommand.ALGO_METAVAR
+        metavar=constants.DeobfusSubCommand.ALGO_METAVAR,
     )
 
     deobfus_parser.add_argument(
@@ -237,7 +237,7 @@ def creating_parser() -> ArgumentParser:
         type=int,
         default=3,
         help=constants.DeobfusSubCommand.STRIDE_HELP,
-        metavar=constants.DeobfusSubCommand.STRIDE_METAVAR
+        metavar=constants.DeobfusSubCommand.STRIDE_METAVAR,
     )
 
     deobfus_parser.add_argument(
@@ -246,7 +246,7 @@ def creating_parser() -> ArgumentParser:
         type=int,
         default=1,
         help=constants.DeobfusSubCommand.NOISE_LEN_HELP,
-        metavar=constants.DeobfusSubCommand.NOISE_LEN_METAVAR
+        metavar=constants.DeobfusSubCommand.NOISE_LEN_METAVAR,
     )
 
     deobfus_parser.add_argument(
@@ -255,9 +255,58 @@ def creating_parser() -> ArgumentParser:
         type=str,
         default="+",
         help=constants.DeobfusSubCommand.OPERATOR_HELP,
-        metavar=constants.DeobfusSubCommand.OPERATOR_METAVAR
+        metavar=constants.DeobfusSubCommand.OPERATOR_METAVAR,
     )
 
+    test_parser = subparser.add_parser(
+        "test",
+        description=constants.TestSubCommand.DESCRIPTION,
+        help=constants.TestSubCommand.HELP,
+        epilog=constants.TestSubCommand.EPILOG,
+        formatter_class=RawTextHelpFormatter,
+    )
+
+    test_parser.set_defaults(func=routers.routing_test)
+
+    test_parser_group = test_parser.add_mutually_exclusive_group(required=True)
+
+    test_parser_group.add_argument(
+        "-P",
+        "--payload",
+        type=str,
+        help=constants.TestSubCommand.PAYLOAD_HELP,
+        metavar=constants.TestSubCommand.PAYLOAD_METAVAR,
+    )
+
+    test_parser_group.add_argument(
+        "-F",
+        "--file",
+        type=Path,
+        help=constants.TestSubCommand.FILE_HELP,
+        metavar=constants.TestSubCommand.FILE_METAVAR,
+    )
+
+    test_parser.add_argument(
+        "-r",
+        "--rules",
+        required=True,
+        type=Path,
+        help="",
+    )
+
+    test_parser.add_argument(
+        "-o",
+        "--output-dir",
+        type=Path,
+        default=Path("./test_results"),
+        help="",
+    )
+
+    test_parser.add_argument(
+        "-A",
+        "--add-rules",
+        type=Path,
+    )
 
     return parser
 

