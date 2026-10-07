@@ -268,7 +268,7 @@ def creating_parser() -> ArgumentParser:
 
     test_parser.set_defaults(func=routers.routing_test)
 
-    test_parser_group = test_parser.add_mutually_exclusive_group(required=True)
+    test_parser_group = test_parser.add_mutually_exclusive_group()
 
     test_parser_group.add_argument(
         "-P",
@@ -289,9 +289,9 @@ def creating_parser() -> ArgumentParser:
     test_parser.add_argument(
         "-r",
         "--rules",
-        required=True,
         type=Path,
-        help="",
+        help=constants.TestSubCommand.RULES_HELP,
+        metavar=constants.TestSubCommand.RULES_METAVAR,
     )
 
     test_parser.add_argument(
@@ -299,13 +299,16 @@ def creating_parser() -> ArgumentParser:
         "--output-dir",
         type=Path,
         default=Path("./test_results"),
-        help="",
+        help=constants.TestSubCommand.OUTPUT_DIR_HELP,
+        metavar=constants.TestSubCommand.OUTPUT_DIR_METAVAR,
     )
 
     test_parser.add_argument(
         "-A",
         "--add-rules",
         type=Path,
+        help=constants.TestSubCommand.ADD_RULES_HELP,
+        metavar=constants.TestSubCommand.ADD_RULES_METAVAR,
     )
 
     return parser

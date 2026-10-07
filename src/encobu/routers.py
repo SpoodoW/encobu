@@ -160,6 +160,13 @@ def routing_deobfuscation(args: Namespace) -> int:
 
 
 def routing_test(args: Namespace) -> int:
+    if args.add_rules:
+        return test.add_rule(rule_file=args.add_rules)
+
+    if not args.rules:
+        print("Error: You must specify a YARA rule file (-r) to run a test.", file=sys.stderr)
+        return 1
+
     if args.file:
         try:
             payload = args.file.read_text(encoding="utf-8")
@@ -169,18 +176,20 @@ def routing_test(args: Namespace) -> int:
                 f"Error: Could not read payload file {args.file}: {e}", file=sys.stderr
             )
             return 1
-    else:
+    elif args.payload:
         payload = args.payload
         identifier = "inline_payload"
+    else:
+        print("Error: You must provide a payload using either -P (inline) or -F (file).", file=sys.stderr)
+        return 1
 
     try:
-        test.run_test(
+       return test.run_test(
             payload=payload,
             rules_path=args.rules,
             output_dir=args.output_dir,
             identifier=identifier
         )
-        return 0
     except KeyboardInterrupt:
         print("\n [-] Test aborted by user.", file=sys.stderr)
         return 1

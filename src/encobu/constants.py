@@ -142,3 +142,12 @@ class TestSubCommand:
 
     FILE_HELP = "The file you want to test against different yara rules"
     FILE_METAVAR = "<FILE>"
+
+    RULES_HELP = "YARA rule to test against different payloads."
+    RULES_METAVAR = "<RULE>"
+
+    OUTPUT_DIR_HELP = "Path to create the output directory (default: %(default)s)"
+    OUTPUT_DIR_METAVAR = "<OUTPUT_DIR>"
+
+    ADD_RULES_HELP = "Path to syntactically correct YARA rule file"
+    ADD_RULES_METAVAR = "<ADD_RULE>"

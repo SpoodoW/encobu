@@ -6,7 +6,9 @@ rule PHP_ReverseShell {
 		version      = "1.0"
 		severity     = "Critical"
 		mitre_attack = "T1059.004"
-		reference    = "https://pentestmonkey.net/cheat-sheet/shells/reverse-shell-cheat-sheet"
+		score        = 9.0
+		reference_1  = "https://www.revshells.com/"
+		reference_2  = "https://swisskyrepo.github.io/InternalAllTheThings/cheatsheets/shell-reverse-cheatsheet/"
 	strings:
 		$php_raw_regex    = /php\s+-r\s+['"]\$\w+\s*=\s*fsockopen\(\s*['"]\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}['"]\s*,\s*\d{1,5}\s*\)/ ascii wide
 		$base64_fsock_php = "fsockopen" base64 base64wide
@@ -26,7 +28,9 @@ rule Bash_ReverseShell {
 		version      = "1.0"
 		severity     = "Critical"
 		mitre_attack = "T1059.004"
-		reference    = "https://pentestmonkey.net/cheat-sheet/shells/reverse-shell-cheat-sheet"
+		score        = 9.0
+		reference_1  = "https://www.revshells.com/"
+		reference_2  = "https://swisskyrepo.github.io/InternalAllTheThings/cheatsheets/shell-reverse-cheatsheet/"
 	strings:
 		$bash_classic_raw_regex = /bash\s+-i\s*>\&\s*\/dev\/tcp\/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,5}/ ascii wide
 		$bash_exec_raw_regex    = /0<&\d+\s*;\s*exec\s+\d+<>\/dev\/tcp\/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,5}/ ascii wide
@@ -47,7 +51,9 @@ rule Python_ReverseShell {
 		version      = "1.0"
 		severity     = "Critical"
 		mitre_attack = "T1059.006"
-		reference    = "https://pentestmonkey.net/cheat-sheet/shells/reverse-shell-cheat-sheet"
+		score        = 9.0
+		reference_1  = "https://www.revshells.com/"
+		reference_2  = "https://swisskyrepo.github.io/InternalAllTheThings/cheatsheets/shell-reverse-cheatsheet/"
 	strings:
 		$python_raw_regex   = /python(?:3)?\s+-c\s+['"]import\s+socket,\s*subprocess,\s*os\s*;\s*\w+\s*=\s*socket\.socket\(socket\.AF_INET,\s*socket\.SOCK_STREAM\);\s*\w+\.connect\(\(['"]\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}['"],\s*\d{1,5}\)\)/ ascii wide
 		$base64_sock_python = "socket.socket(socket.AF_INET" base64 base64wide
