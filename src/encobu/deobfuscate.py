@@ -1,6 +1,6 @@
 import codecs
 
-from encobu.obfuscate import ABTASH_MAP
+from encobu.obfuscate import ATBASH_MAP
 
 
 def rev_rand_char_insert(payload: str, stride: int, noise_len: int) -> str:
@@ -21,7 +21,7 @@ def rev_split_and_concat(payload: str, concat_opr: str = "+") -> str:
 
 
 def rev_reverse_transform(payload: str) -> str:
-    return payload.translate(ABTASH_MAP).replace("_", " ")
+    return payload.translate(ATBASH_MAP).replace("_", " ")
 
 
 def rev_escape_sequence(payload: str) -> str:

@@ -13,10 +13,10 @@ def from_rot13(payload: str) -> str:
 
 def from_xor(payload: str, key: str) -> str:
     key_in_bytes = key.encode("utf-8")
-    xor_str = from_base64(payload).encode("utf-8")
-    return bytes(p ^ k for p, k in zip(xor_str, itertools.cycle(key_in_bytes))).decode(
-        "utf-8"
-    )
+    xor_bytes = base64.b64decode(payload.encode("utf-8"))
+    return bytes(
+        p ^ k for p, k in zip(xor_bytes, itertools.cycle(key_in_bytes))
+    ).decode("utf-8")
 
 
 def from_base64_rot13(payload: str) -> str:

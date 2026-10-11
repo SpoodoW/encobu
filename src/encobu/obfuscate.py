@@ -2,7 +2,7 @@ import random
 import string
 import textwrap
 
-ABTASH_MAP = str.maketrans(
+ATBASH_MAP= str.maketrans(
     string.ascii_uppercase + string.ascii_lowercase,
     string.ascii_uppercase[::-1] + string.ascii_lowercase[::-1],
 )
@@ -30,7 +30,7 @@ def split_and_concat(payload: str, stride: int, concat_operator: str = "+") -> s
 
 
 def reverse_transform(payload: str) -> str:
-    return payload.replace(" ", "_").translate(ABTASH_MAP)
+    return payload.replace(" ", "_").translate(ATBASH_MAP)
 
 
 def escape_sequence(
@@ -43,7 +43,7 @@ def escape_sequence(
 
     result = []
 
-    if escape_type == "ocatal":
+    if escape_type == "octal":
         for char in payload:
             result.append(
                 char if random.choice([True, False]) else f"\\{ord(char):03o}"
