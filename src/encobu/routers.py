@@ -1,7 +1,7 @@
 import sys
 from argparse import Namespace
 
-from . import decode, deobfuscate, encode, enums, obfuscate, test
+from . import decode, deobfuscate, encode, enums, obfuscate, report, test
 
 
 def routing_encode(args: Namespace) -> int:
@@ -60,7 +60,9 @@ def routing_obfuscation(args: Namespace) -> int:
     match args.algorithm:
         case enums.ObfuscationAlgos.RANDOM_CHARACTER_INSERTION:
             result = obfuscate.rand_char_insert(
-                payload=payload_to_obfus, stride=args.stride, noise_len=args.noise_length
+                payload=payload_to_obfus,
+                stride=args.stride,
+                noise_len=args.noise_length,
             )
 
         case enums.ObfuscationAlgos.SPLIT_AND_CONCATENATE:
@@ -141,7 +143,9 @@ def routing_deobfuscation(args: Namespace) -> int:
     match args.algorithm:
         case enums.DeobfuscationAlgos.REVERSE_RANDOM_CHARACTER_INSERTION:
             result = deobfuscate.rev_rand_char_insert(
-                payload=obfuscated_payload, stride=args.stride, noise_len=args.noise_length
+                payload=obfuscated_payload,
+                stride=args.stride,
+                noise_len=args.noise_length,
             )
         case enums.DeobfuscationAlgos.REVERSE_SPLIT_AND_CONCATENATE:
             result = deobfuscate.rev_split_and_concat(
@@ -164,7 +168,10 @@ def routing_test(args: Namespace) -> int:
         return test.add_rule(rule_file=args.add_rules)
 
     if not args.rules:
-        print("Error: You must specify a YARA rule file (-r) to run a test.", file=sys.stderr)
+        print(
+            "Error: You must specify a YARA rule file (-r) to run a test.",
+            file=sys.stderr,
+        )
         return 1
 
     if args.file:
@@ -180,16 +187,38 @@ def routing_test(args: Namespace) -> int:
         payload = args.payload
         identifier = "inline_payload"
     else:
-        print("Error: You must provide a payload using either -P (inline) or -F (file).", file=sys.stderr)
+        print(
+            "Error: You must provide a payload using either -P (inline) or -F (file).",
+            file=sys.stderr,
+        )
         return 1
 
     try:
-       return test.run_test(
+        return test.run_test(
             payload=payload,
             rules_path=args.rules,
             output_dir=args.output_dir,
-            identifier=identifier
+            identifier=identifier,
         )
     except KeyboardInterrupt:
         print("\n [-] Test aborted by user.", file=sys.stderr)
         return 1
+
+
+def routing_report(args: Namespace) -> int:
+    if args.summary and (args.original or args.modified):
+        print("Error: Cannot combine summary mode (-s) with comparison mode (-o/-m).", file=sys.stderr)
+        return 1
+
+    if args.summary:
+        return report.generate_summary(report_paths=args.summary)
+
+    if args.original and args.modified:
+        return report.generate_comparison(original_path=args.original, modified_path=args.modified)
+
+    if args.original or args.modified:
+        print("Error: Comparative analysis requires both (-o/--original) AND (-m/--modified).", file=sys.stderr)
+        return 1
+
+    print("Error: You must specify either (-s) for summary mode or both (-o and -m) for comparison mode.", file=sys.stderr)
+    return 1

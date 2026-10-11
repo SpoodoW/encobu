@@ -21,6 +21,8 @@ Thumbs.db
 
 # AI
 context.md
+.agents/
 
 #Test Results
 test_results/
+payload.txt

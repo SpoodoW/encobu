@@ -311,6 +311,41 @@ def creating_parser() -> ArgumentParser:
         metavar=constants.TestSubCommand.ADD_RULES_METAVAR,
     )
 
+    report_parser = subparser.add_parser(
+        "report",
+        description=constants.ReportSubCommand.DESCRIPTION,
+        help=constants.ReportSubCommand.HELP,
+        epilog=constants.ReportSubCommand.EPILOG,
+        formatter_class=RawTextHelpFormatter,
+    )
+
+    report_parser.set_defaults(func=routers.routing_report)
+
+    report_parser.add_argument(
+        "-s",
+        "--summary",
+        type=Path,
+        nargs="+",
+        help=constants.ReportSubCommand.SUMMARY_HELP,
+        metavar=constants.ReportSubCommand.SUMMARY_METAVAR,
+    )
+
+    report_parser.add_argument(
+        "-o",
+        "--original",
+        type=Path,
+        help=constants.ReportSubCommand.ORIGINAL_HELP,
+        metavar=constants.ReportSubCommand.ORIGINAL_METAVAR,
+    )
+
+    report_parser.add_argument(
+        "-m",
+        "--modified",
+        type=Path,
+        help=constants.ReportSubCommand.MODIFIED_HELP,
+        metavar=constants.ReportSubCommand.MODIFIED_METAVAR,
+    )
+
     return parser
 
 
