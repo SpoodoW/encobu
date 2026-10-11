@@ -290,6 +290,7 @@ def creating_parser() -> ArgumentParser:
         "-r",
         "--rules",
         type=Path,
+        nargs="+",
         help=constants.TestSubCommand.RULES_HELP,
         metavar=constants.TestSubCommand.RULES_METAVAR,
     )

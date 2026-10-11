@@ -196,7 +196,7 @@ def routing_test(args: Namespace) -> int:
     try:
         return test.run_test(
             payload=payload,
-            rules_path=args.rules,
+            rule_paths=args.rules,
             output_dir=args.output_dir,
             identifier=identifier,
         )
@@ -207,18 +207,29 @@ def routing_test(args: Namespace) -> int:
 
 def routing_report(args: Namespace) -> int:
     if args.summary and (args.original or args.modified):
-        print("Error: Cannot combine summary mode (-s) with comparison mode (-o/-m).", file=sys.stderr)
+        print(
+            "Error: Cannot combine summary mode (-s) with comparison mode (-o/-m).",
+            file=sys.stderr,
+        )
         return 1
 
     if args.summary:
         return report.generate_summary(report_paths=args.summary)
 
     if args.original and args.modified:
-        return report.generate_comparison(original_path=args.original, modified_path=args.modified)
+        return report.generate_comparison(
+            original_path=args.original, modified_path=args.modified
+        )
 
     if args.original or args.modified:
-        print("Error: Comparative analysis requires both (-o/--original) AND (-m/--modified).", file=sys.stderr)
+        print(
+            "Error: Comparative analysis requires both (-o/--original) AND (-m/--modified).",
+            file=sys.stderr,
+        )
         return 1
 
-    print("Error: You must specify either (-s) for summary mode or both (-o and -m) for comparison mode.", file=sys.stderr)
+    print(
+        "Error: You must specify either (-s) for summary mode or both (-o and -m) for comparison mode.",
+        file=sys.stderr,
+    )
     return 1

