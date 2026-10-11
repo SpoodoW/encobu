@@ -1,7 +1,7 @@
-import sys
 from argparse import Namespace
 
 from . import decode, deobfuscate, encode, enums, obfuscate, report, test
+from .console import print_error
 
 
 def routing_encode(args: Namespace) -> int:
@@ -9,7 +9,7 @@ def routing_encode(args: Namespace) -> int:
         try:
             payload_to_enc = args.file.read_text(encoding="utf-8")
         except FileNotFoundError:
-            print(f"Error: The file {args.file} was not found.", file=sys.stderr)
+            print_error(f"The file {args.file} was not found.")
             return 1
     else:
         payload_to_enc = args.payload
@@ -21,9 +21,8 @@ def routing_encode(args: Namespace) -> int:
             result = encode.to_rot13(payload=payload_to_enc)
         case enums.EncodingMethod.XOR:
             if not args.key:
-                print(
-                    "Error: The XOR cipher requires the key to be specified with -k OR --key.",
-                    file=sys.stderr,
+                print_error(
+                    "The XOR cipher requires the key to be specified with -k OR --key."
                 )
                 return 1
             result = encode.apply_xor(payload=payload_to_enc, key=args.key)
@@ -31,16 +30,14 @@ def routing_encode(args: Namespace) -> int:
             result = encode.to_base64_rot13(payload=payload_to_enc)
         case enums.EncodingMethod.XOR_B64_ROT13:
             if not args.key:
-                print(
-                    "Error: The XOR cipher requires the key to be specified with -k OR --key.",
-                    file=sys.stderr,
+                print_error(
+                    "The XOR cipher requires the key to be specified with -k OR --key."
                 )
                 return 1
             result = encode.apply_xor_base64_rot13(payload=payload_to_enc, key=args.key)
         case _:
-            raise NotImplementedError(
-                f"Invalid or Unavailable choice of method: {args.method}"
-            )
+            print_error(f"Specified method not recognized: {args.method}")
+            return 1
 
     print(result)
 
@@ -52,7 +49,7 @@ def routing_obfuscation(args: Namespace) -> int:
         try:
             payload_to_obfus = args.file.read_text(encoding="utf-8")
         except FileNotFoundError:
-            print(f"Error: The file {args.file} was not found.", file=sys.stderr)
+            print_error(f"The file {args.file} was not found.")
             return 1
     else:
         payload_to_obfus = args.payload
@@ -83,7 +80,7 @@ def routing_obfuscation(args: Namespace) -> int:
             )
 
         case _:
-            print("Error specified algorithm not recognized", file=sys.stderr)
+            print_error(f"Specified algorithm not recognized: {args.algorithm}")
             return 1
 
     print(result)
@@ -95,7 +92,7 @@ def routing_decode(args: Namespace) -> int:
         try:
             encoded_payload = args.file.read_text(encoding="utf-8")
         except FileNotFoundError:
-            print(f"Error: The file {args.file} was not found.", file=sys.stderr)
+            print_error(f"The file {args.file} was not found.")
             return 1
     else:
         encoded_payload = args.payload
@@ -107,9 +104,8 @@ def routing_decode(args: Namespace) -> int:
             result = decode.from_rot13(payload=encoded_payload)
         case enums.DecodingMethod.FROM_XOR:
             if not args.key:
-                print(
-                    "Error: The XOR cipher requires the key to be specified with -k OR --key.",
-                    file=sys.stderr,
+                print_error(
+                    "The XOR cipher requires the key to be specified with -k OR --key."
                 )
                 return 1
             result = decode.from_xor(payload=encoded_payload, key=args.key)
@@ -117,14 +113,13 @@ def routing_decode(args: Namespace) -> int:
             result = decode.from_base64_rot13(payload=encoded_payload)
         case enums.DecodingMethod.FROM_XOR_B64_ROT13:
             if not args.key:
-                print(
-                    "Error: The XOR cipher requires the key to be specified with -k OR --key.",
-                    file=sys.stderr,
+                print_error(
+                    "The XOR cipher requires the key to be specified with -k OR --key."
                 )
                 return 1
             result = decode.from_xor_base64_rot13(payload=encoded_payload, key=args.key)
         case _:
-            print("Error specified algorithm not recognized", file=sys.stderr)
+            print_error(f"Specified method not recognized: {args.method}")
             return 1
     print(result)
     return 0
@@ -135,7 +130,7 @@ def routing_deobfuscation(args: Namespace) -> int:
         try:
             obfuscated_payload = args.file.read_text(encoding="utf-8")
         except FileNotFoundError:
-            print(f"Error: The file {args.file} was not found.", file=sys.stderr)
+            print_error(f"The file {args.file} was not found.")
             return 1
     else:
         obfuscated_payload = args.payload
@@ -156,7 +151,7 @@ def routing_deobfuscation(args: Namespace) -> int:
         case enums.DeobfuscationAlgos.REVERSE_ESCAPE_SEQUENCE_OBFUSCATION:
             result = deobfuscate.rev_escape_sequence(payload=obfuscated_payload)
         case _:
-            print("Error specified algorithm not recognized", file=sys.stderr)
+            print_error(f"Specified algorithm not recognized: {args.algorithm}")
             return 1
 
     print(result)
@@ -168,10 +163,7 @@ def routing_test(args: Namespace) -> int:
         return test.add_rule(rule_file=args.add_rules)
 
     if not args.rules:
-        print(
-            "Error: You must specify a YARA rule file (-r) to run a test.",
-            file=sys.stderr,
-        )
+        print_error("You must specify a YARA rule file (-r) to run a test.")
         return 1
 
     if args.file:
@@ -179,18 +171,13 @@ def routing_test(args: Namespace) -> int:
             payload = args.file.read_text(encoding="utf-8")
             identifier = args.file.name
         except OSError as e:
-            print(
-                f"Error: Could not read payload file {args.file}: {e}", file=sys.stderr
-            )
+            print_error(f"Could not read payload file {args.file}: {e}")
             return 1
     elif args.payload:
         payload = args.payload
         identifier = "inline_payload"
     else:
-        print(
-            "Error: You must provide a payload using either -P (inline) or -F (file).",
-            file=sys.stderr,
-        )
+        print_error("You must provide a payload using either -P (inline) or -F (file).")
         return 1
 
     try:
@@ -201,16 +188,13 @@ def routing_test(args: Namespace) -> int:
             identifier=identifier,
         )
     except KeyboardInterrupt:
-        print("\n [-] Test aborted by user.", file=sys.stderr)
+        print_error("\n Test aborted by user.")
         return 1
 
 
 def routing_report(args: Namespace) -> int:
     if args.summary and (args.original or args.modified):
-        print(
-            "Error: Cannot combine summary mode (-s) with comparison mode (-o/-m).",
-            file=sys.stderr,
-        )
+        print_error("Cannot combine summary mode (-s) with comparison mode (-o/-m).")
         return 1
 
     if args.summary:
@@ -222,14 +206,12 @@ def routing_report(args: Namespace) -> int:
         )
 
     if args.original or args.modified:
-        print(
-            "Error: Comparative analysis requires both (-o/--original) AND (-m/--modified).",
-            file=sys.stderr,
+        print_error(
+            "Comparative analysis requires both (-o/--original) AND (-m/--modified)."
         )
         return 1
 
-    print(
-        "Error: You must specify either (-s) for summary mode or both (-o and -m) for comparison mode.",
-        file=sys.stderr,
+    print_error(
+        "You must specify either (-s) for summary mode or both (-o and -m) for comparison mode."
     )
     return 1

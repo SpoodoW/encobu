@@ -1,11 +1,11 @@
 import json
-import sys
 from pathlib import Path
 
 from rich import box
-from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
+
+from .console import console, print_error, print_warning
 
 SEVERITY_STYLES = {
     "critical": "bold red",
@@ -25,21 +25,19 @@ def _collect_report_files(report_paths: list[Path]) -> list[Path]:
     json_files = []
     for path in report_paths:
         if not path.exists():
-            print(f"Error: {path} does not exist. Skipping.", file=sys.stderr)
+            print_error(f"The {path} does not exist. Skipping.")
             continue
         if path.is_file():
             if path.suffix.lower() == ".json":
                 json_files.append(path)
             else:
-                print(
-                    f"Warning: {path} is not a .json file. Skipping.", file=sys.stderr
-                )
+                print_warning(f"The {path} is not a .json file. Skipping.")
         elif path.is_dir():
             for file in path.rglob("*.json"):
                 if file.is_file():
                     json_files.append(file)
         else:
-            print(f"Warning: {path} is an unsupported file type.", file=sys.stderr)
+            print_warning(f"The {path} is an unsupported file type.")
             continue
     return json_files
 
@@ -51,14 +49,11 @@ def _load_report_data(json_files: list[Path]) -> list[dict]:
         try:
             data = json.loads(file.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError) as e:
-            print(f"Warning: could not read {file}: {e}", file=sys.stderr)
+            print_warning(f"Could not read {file}: {e}")
             continue
 
         if not isinstance(data, dict) or "target_test" not in data:
-            print(
-                f"Warning: {file} is not a valid encobu report file. Skipping.",
-                file=sys.stderr,
-            )
+            print_warning(f"The {file} is not a valid encobu report file. Skipping.")
             continue
 
         report_data.append(
@@ -130,9 +125,8 @@ def generate_summary(report_paths: list[Path]) -> int:
     json_files = _collect_report_files(report_paths)
     report_data = _load_report_data(json_files)
     if not report_data:
-        print("No valid report data found.", file=sys.stderr)
+        print_error("No valid report data found.")
         return 1
-    console = Console()
     table = _build_summary_table(report_data)
 
     console.line()
@@ -244,16 +238,12 @@ def generate_comparison(original_path: Path, modified_path: Path) -> int:
     mod_data = _load_report_data(mod_files)
 
     if not orig_data or not mod_data:
-        print(
-            "Error: Could not load both valid report files for comparison.",
-            file=sys.stderr,
-        )
+        print_error("Could not load both valid report files for comparison.")
         return 1
 
     orig_report = orig_data[0]
     mod_report = mod_data[0]
 
-    console = Console()
     panel = _build_comparison_panel(orig_report, mod_report)
     table = _build_comparison_table(orig_report, mod_report)
 

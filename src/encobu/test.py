@@ -1,9 +1,10 @@
 import hashlib
 import json
-import sys
 from pathlib import Path
 
 import yara_x
+
+from .console import print_error, print_success, print_warning
 
 
 def _collect_rule_files(rule_paths: list[Path]) -> list[Path]:
@@ -11,9 +12,7 @@ def _collect_rule_files(rule_paths: list[Path]) -> list[Path]:
     seen = set()
     for path in rule_paths:
         if not path.exists():
-            print(
-                f"Warning: Rule path {path} does not exist. Skipping.", file=sys.stderr
-            )
+            print_warning(f"Rule path {path} does not exist. Skipping.")
             continue
         if path.is_file() and path.suffix.lower() in [".yar", ".yara"]:
             resolved = path.resolve()
@@ -36,7 +35,7 @@ def run_test(
     output_dir.mkdir(parents=True, exist_ok=True)
     rule_files = _collect_rule_files(rule_paths)
     if not rule_files:
-        print("Error: No valid .yar or .yara rule files found.", file=sys.stderr)
+        print_error("No valid .yar or .yara rule files found.")
         return 1
     compiler = yara_x.Compiler()
     compiled_rule_files = []
@@ -44,21 +43,21 @@ def run_test(
         try:
             rule_text = rule_file.read_text(encoding="utf-8")
         except OSError as e:
-            print(f"Filesystem error reading yara rules: {e}", file=sys.stderr)
+            print_error(f"Filesystem error reading yara rules: {e}")
             continue
         except UnicodeDecodeError as e:
-            print(f"Encoding error: Rules file must be UTF-8: {e}", file=sys.stderr)
+            print_error(f"Encoding error: Rules file must be UTF-8: {e}")
             continue
 
         try:
             compiler.add_source(rule_text, origin=rule_file.name)
             compiled_rule_files.append(rule_file)
         except yara_x.CompileError as e:
-            print(f"YARA syntax or compilation error: {e}", file=sys.stderr)
+            print_error(f"YARA syntax or compilation error: {e}")
             continue
 
     if not compiled_rule_files:
-        print("Error: No rules were compiled successfully.", file=sys.stderr)
+        print_error("No rules were compiled successfully.")
         return 1
 
     rules = compiler.build()
@@ -74,7 +73,7 @@ def run_test(
     try:
         results = rules.scan(payload_bytes)
     except RuntimeError as e:
-        print(f"Runtime error during YARA scan execution: {e}", file=sys.stderr)
+        print_error(f"Runtime error during YARA scan execution: {e}")
         return 1
 
     matched_rules = []
@@ -101,39 +100,38 @@ def run_test(
     output_filepath = output_dir / f"{safe_identifier}_results.json"
     try:
         output_filepath.write_text(json.dumps(report_data, indent=4), encoding="utf-8")
-        print(f"[+] Test complete. Results saved to: {output_filepath}")
+        print_success(f"Results saved to: {output_filepath}")
         return 0
     except OSError as e:
-        print(f"Error saving results: {e}", file=sys.stderr)
+        print_error(f"Error saving results: {e}")
         return 1
 
 
 def add_rule(rule_file: Path) -> int:
     if not rule_file.is_file():
-        print(f"Error: The file {rule_file} does not exist.", file=sys.stderr)
+        print_error(f"The file {rule_file} does not exist.")
         return 1
 
     if rule_file.suffix not in [".yar", ".yara"]:
-        print(
-            f"Error: Invalid file type. Expected .yar or .yara, got {rule_file.suffix}",
-            file=sys.stderr,
+        print_error(
+            f"Invalid file type. Expected .yar or .yara, got {rule_file.suffix}"
         )
         return 1
 
     try:
         rule_text = rule_file.read_text(encoding="utf-8")
     except OSError as e:
-        print(f"Filesystem error reading yara rules: {e}", file=sys.stderr)
+        print_error(f"Filesystem error reading yara rules: {e}")
         return 1
     except UnicodeDecodeError as e:
-        print(f"Encoding error: Rules file must be UTF-8: {e}", file=sys.stderr)
+        print_error(f"Encoding error: Rules file must be UTF-8: {e}")
         return 1
 
     try:
         yara_x.compile(rule_text)
-        print(f"[+] Successfully compiled the rule: {rule_file.name}")
+        print_success(f"Successfully compiled the rule: {rule_file.name}")
     except yara_x.CompileError as e:
-        print(f"YARA syntax or compilation error: {e}", file=sys.stderr)
+        print_error(f"YARA syntax or compilation error: {e}")
         return 1
 
     rules_dir = Path("./rules")
@@ -143,8 +141,8 @@ def add_rule(rule_file: Path) -> int:
 
     try:
         dest.write_text(rule_text, encoding="utf-8")
-        print(f"[+] Successfully added and validated rule: {rule_file.name}")
+        print_success(f"Successfully added and validated rule: {rule_file.name}")
         return 0
     except OSError as e:
-        print(f"Error: Saving rule: {e}", file=sys.stderr)
+        print_error(f"Error: Saving rule: {e}")
         return 1
