@@ -6,8 +6,9 @@ import itertools
 def to_base64(payload: str) -> str:
     return base64.b64encode(payload.encode("utf-8")).decode("utf-8")
 
+
 def to_rot13(payload: str) -> str:
-    return codecs.encode(payload, "rot13")
+    return codecs.encode(payload, encoding="rot13")
 
 
 def to_base64_rot13(payload: str) -> str:
@@ -15,9 +16,13 @@ def to_base64_rot13(payload: str) -> str:
 
 
 def apply_xor(payload: str, key: str) -> str:
-    payload_bytes = payload.encode("utf-8")
-    key_bytes = key.encode("utf-8")
-    xor_bytes = bytes(p^k for p,k in zip(payload_bytes, itertools.cycle(key_bytes)))
+    xor_bytes = bytes(
+        p ^ k
+        for p, k in zip(
+            payload.encode(encoding="utf-8"),
+            itertools.cycle(key.encode(encoding="utf-8")),
+        )
+    )
     return base64.b64encode(xor_bytes).decode("utf-8")
 
 
