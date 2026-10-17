@@ -11,17 +11,17 @@ def rev_rand_char_insert(payload: str, stride: int, noise_len: int) -> str:
         chunks.append(payload[i : i + stride])
 
     original_payload = "".join(chunks)
-    return original_payload.replace("_", " ")
+    return original_payload
 
 
 def rev_split_and_concat(payload: str, concat_opr: str = "+") -> str:
     payload_glued = payload.split(f" {concat_opr} ")
     original_payload = "".join(chunk.strip('"') for chunk in payload_glued)
-    return original_payload.replace("_", " ")
+    return original_payload
 
 
 def rev_reverse_transform(payload: str) -> str:
-    return payload.translate(ATBASH_MAP).replace("_", " ")
+    return payload.translate(ATBASH_MAP)
 
 
 def rev_escape_sequence(payload: str) -> str:
