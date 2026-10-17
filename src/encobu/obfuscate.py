@@ -1,21 +1,19 @@
 import random
 import string
-import textwrap
 
-ATBASH_MAP= str.maketrans(
+ATBASH_MAP = str.maketrans(
     string.ascii_uppercase + string.ascii_lowercase,
     string.ascii_uppercase[::-1] + string.ascii_lowercase[::-1],
 )
 
 
 def rand_char_insert(payload: str, stride: int, noise_len: int) -> str:
-    payload_stripped = payload.replace(" ", "_")
     chunks = []
-    for i in range(0, len(payload_stripped), stride):
-        chunk = payload_stripped[i : i + stride]
+    for i in range(0, len(payload), stride):
+        chunk = payload[i : i + stride]
         chunks.append(chunk)
 
-        if i + stride < len(payload_stripped):
+        if i + stride < len(payload):
             noise_char = "".join(random.choices(string.ascii_letters, k=noise_len))
             chunks.append(noise_char)
 
@@ -23,14 +21,12 @@ def rand_char_insert(payload: str, stride: int, noise_len: int) -> str:
 
 
 def split_and_concat(payload: str, stride: int, concat_operator: str = "+") -> str:
-    payload_stripped = payload.replace(" ", "_")
-    chunks = textwrap.wrap(payload_stripped, width=stride)
-
+    chunks = [payload[i : i + stride] for i in range(0, len(payload), stride)]
     return f" {concat_operator} ".join(f'"{chunk}"' for chunk in chunks)
 
 
 def reverse_transform(payload: str) -> str:
-    return payload.replace(" ", "_").translate(ATBASH_MAP)
+    return payload.translate(ATBASH_MAP)
 
 
 def escape_sequence(
