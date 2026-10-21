@@ -107,42 +107,53 @@ def run_test(
         return 1
 
 
-def add_rule(rule_file: Path) -> int:
-    if not rule_file.is_file():
-        print_error(f"The file {rule_file} does not exist.")
-        return 1
-
-    if rule_file.suffix not in [".yar", ".yara"]:
-        print_error(
-            f"Invalid file type. Expected .yar or .yara, got {rule_file.suffix}"
-        )
-        return 1
-
-    try:
-        rule_text = rule_file.read_text(encoding="utf-8")
-    except OSError as e:
-        print_error(f"Filesystem error reading yara rules: {e}")
-        return 1
-    except UnicodeDecodeError as e:
-        print_error(f"Encoding error: Rules file must be UTF-8: {e}")
-        return 1
-
-    try:
-        yara_x.compile(rule_text)
-        print_success(f"Successfully compiled the rule: {rule_file.name}")
-    except yara_x.CompileError as e:
-        print_error(f"YARA syntax or compilation error: {e}")
+def add_rule(rules_path: list[Path]) -> int:
+    rule_files = _collect_rule_files(rules_path)
+    if not rule_files:
+        print_error("No valid .yar or .yara rule files found.")
         return 1
 
     rules_dir = Path("./rules")
-    rules_dir.mkdir(parents=True, exist_ok=True)
-
-    dest = rules_dir / rule_file.name
 
     try:
-        dest.write_text(rule_text, encoding="utf-8")
-        print_success(f"Successfully added and validated rule: {rule_file.name}")
-        return 0
+        rules_dir.mkdir(parents=True, exist_ok=True)
     except OSError as e:
-        print_error(f"Error: Saving rule: {e}")
+        print_error(f"Error creating rules directory: {e}")
         return 1
+
+    failed = False
+    added = 0
+
+    for rule_file in rule_files:
+        try:
+            rule_text = rule_file.read_text(encoding="utf-8")
+        except OSError as e:
+            print_error(f"Filesystem error reading yara rules: {e}")
+            failed = True
+            continue
+        except UnicodeDecodeError as e:
+            print_error(f"Encoding error: Rules file must be UTF-8: {e}")
+            failed = True
+            continue
+        try:
+            yara_x.compile(rule_text)
+        except yara_x.CompileError as e:
+            print_error(f"YARA syntax or compilation error: {e}")
+            failed = True
+            continue
+
+        dest = rules_dir / rule_file.name
+
+        try:
+            dest.write_text(rule_text, encoding="utf-8")
+        except OSError as e:
+            print_error(f"Error: Saving rule: {e}")
+            failed = True
+            continue
+
+        added += 1
+    
+    if added:
+        print_success(f"Successfully added {added} rule file(s).")
+
+    return 1 if failed else 0
