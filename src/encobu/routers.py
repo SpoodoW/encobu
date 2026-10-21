@@ -160,7 +160,7 @@ def routing_deobfuscation(args: Namespace) -> int:
 
 def routing_test(args: Namespace) -> int:
     if args.add_rules:
-        return test.add_rule(rule_file=args.add_rules)
+        return test.add_rule(rules_path=args.add_rules)
 
     if not args.rules:
         print_error("You must specify a YARA rule file (-r) to run a test.")
