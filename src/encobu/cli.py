@@ -199,6 +199,9 @@ def creating_parser() -> ArgumentParser:
 
     deobfus_parser = subparser.add_parser(
         "deobfus",
+        description=constants.DeobfusSubCommand.DESCRIPTION,
+        help=constants.DeobfusSubCommand.HELP,
+        epilog=constants.DeobfusSubCommand.EPILOG,
     )
 
     deobfus_parser.set_defaults(func=routers.routing_deobfuscation)
