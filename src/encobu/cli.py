@@ -202,6 +202,7 @@ def creating_parser() -> ArgumentParser:
         description=constants.DeobfusSubCommand.DESCRIPTION,
         help=constants.DeobfusSubCommand.HELP,
         epilog=constants.DeobfusSubCommand.EPILOG,
+        formatter_class=RawTextHelpFormatter,
     )
 
     deobfus_parser.set_defaults(func=routers.routing_deobfuscation)
