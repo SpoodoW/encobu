@@ -1,5 +1,5 @@
 class MainCommand:
-    DESCRIPTION = "A modern cli tool for encoding and obfuscating your payloads and testing them against simple firewall rules."
+    DESCRIPTION = "A modern cli tool for encoding and obfuscating your payloads and testing them against static YARA rules."
     EPILOG = """
     EXAMPLES:
         encobu encode [OPTIONS]
